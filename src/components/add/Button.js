@@ -10,8 +10,8 @@ export default Button = (props) => {
     return (
        <View style = {styles.container}>
           <TouchableOpacity style = {styles.buttonContainer}
-          onPress = {props._userLogin}>
-          <Text style ={styles.loginbutton}>LOGIN</Text>
+          onPress = {props._submitData}>
+          <Text style ={styles.loginbutton}>SIMPAN</Text>
           </TouchableOpacity>
        </View>
     )

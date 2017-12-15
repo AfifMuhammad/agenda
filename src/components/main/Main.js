@@ -3,18 +3,20 @@ import {
   Text,
   View,
   StyleSheet,
-  TouchableOpacity,
+  TouchableOpacity
 } from 'react-native';
-import Calendar from './Calendar';
-import Head from './Head';
+import Calendar from './Calendar'
+//import Head from './Head';
 
 export default class Main extends Component{
+
+  
+  
   render() {
     return (
       <View style={styles.container}>
-        <Head/>
         <View style={styles.calendar}>
-          <Calendar/>
+          <Calendar token = {this.props.token} username = {this.props.username} _goToDetail = {this.goToDetail.bind(this)}/>
           <TouchableOpacity style={styles.fab} onPress={this.goToAdd}>
             <Text style ={styles.plus}>+</Text>
           </TouchableOpacity>
@@ -22,13 +24,26 @@ export default class Main extends Component{
       </View>
     );
   }
+  
   goToAdd = () => {
     this.props.navigator.push({
        name: 'Add',
        title: 'Add',
-       openMenu: this.openMenu
+       token : this.props.token,
+       username : this.props.username
     });
  }
+
+ goToDetail(id){
+  this.props.navigator.push({
+     name: 'Detail',
+     title: 'Detail',
+     token : this.props.token,
+     username : this.props.username,
+     idA : id
+  });
+}
+
 }
 
 
