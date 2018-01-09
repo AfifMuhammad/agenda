@@ -5,8 +5,8 @@ import {
   StyleSheet,
   TouchableOpacity
 } from 'react-native';
-import Calendar from './Calendar'
-//import Head from './Head';
+import Calendar from './Calendar';
+import Header from '../Header';
 
 export default class Main extends Component{
 
@@ -15,6 +15,7 @@ export default class Main extends Component{
   render() {
     return (
       <View style={styles.container}>
+        <Header username = {this.props.nama}/>
         <View style={styles.calendar}>
           <Calendar token = {this.props.token} username = {this.props.username} _goToDetail = {this.goToDetail.bind(this)}/>
           <TouchableOpacity style={styles.fab} onPress={this.goToAdd}>
@@ -24,6 +25,8 @@ export default class Main extends Component{
       </View>
     );
   }
+
+  
   
   goToAdd = () => {
     this.props.navigator.push({
@@ -53,12 +56,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     marginTop : 0,
   },
-  Header: {
-    flex: 1
-  },
   calendar: {
     flex: 1,
-    marginTop : 75,
   },
   fab: {
     width: 60,

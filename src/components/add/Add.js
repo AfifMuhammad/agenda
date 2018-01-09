@@ -1,21 +1,20 @@
 import React, { Component } from 'react';
-import DatePicker from 'react-native-datepicker'
-import Calendar from '../main/Calendar'
+import DatePicker from 'react-native-datepicker';
 import {
   Text,
   View,
   StyleSheet,
   TextInput,
-  TouchableOpacity,
   BackHandler,
   Alert
 } from 'react-native';
 import Button from './Button';
-//import Head from '../main/Head';
+import Header from '../Header';
 
 export default class Add extends Component{
   constructor(props){
     super(props)
+    this.backAndroidHandler = this.backAndroidHandler.bind(this);
     //this._submitData = this._submitData.bind(this);
     this._confirm = this._confirm.bind(this);
     this.state = {
@@ -37,16 +36,20 @@ export default class Add extends Component{
   }
 
   componentDidMount(){
-    BackHandler.addEventListener('hardwareBackPress', () => {
-      this.props.navigator.pop()
-      return true;
-    });
+    BackHandler.addEventListener('hardwareBackPress', this.backAndroidHandler);
   }
+
+  componentWillUnmount(){
+    BackHandler.removeEventListener('hardwareBackPress', this.backAndroidHandler);
+  }
+
+  
   
     render() {
       
       return (
         <View>
+          <Header username = {this.props.username}/>
           <View style={styles.container}>
             <TextInput
               placeholder = "Agenda"
@@ -81,7 +84,7 @@ export default class Add extends Component{
               onDateChange={(datetime) => {
                 this.setState({
                   fulldate: datetime ,date: datetime.substr(0,10), jam_mulai: datetime.substr(11,5)
-                  }), console.log(this.state.date,this.state.jam_mulai)
+                  })
                   }}
             />
 
@@ -112,7 +115,7 @@ export default class Add extends Component{
                   }}
             />
 
-            <TextInput
+            {/* <TextInput
               placeholder = "Tempat"
               placeholderTextColor = '#cccccc'
               returnKeyType="next"
@@ -120,7 +123,7 @@ export default class Add extends Component{
               style = {styles.input}
               onChangeText={(tempat) => this.setState({tempat})}
               >
-            </TextInput>
+            </TextInput> */}
 
             <Button _submitData = {this._confirm}/>
             
@@ -130,10 +133,11 @@ export default class Add extends Component{
       
     }
 
+    backAndroidHandler(){
+      this.props.navigator.pop()
+      return true;
+    } 
 
-    goBack = () =>{
-      this.props.navigator.pop();      
-    }
 
     _confirm(){
       Alert.alert(
@@ -157,9 +161,10 @@ export default class Add extends Component{
       })
       .then((response) => response.json())
       .then((responseData) => {
-        console.log(responseData)
         this.goToMain();
-      })
+      }).catch(error => {
+        alert(error);
+      });
     }
 
     goToMain = () => {
@@ -176,8 +181,7 @@ export default class Add extends Component{
   const styles = StyleSheet.create({
     container: {
       padding :20,
-      marginBottom : 100,
-      marginTop : 100
+      marginBottom : 100
     },
     input:{
       minWidth:300,
@@ -185,20 +189,5 @@ export default class Add extends Component{
       height : 40,
       paddingHorizontal : 10,
       marginBottom : 10,
-    },
-    buttonContainer:{
-      backgroundColor: "#006400",
-      paddingVertical:10,
-      marginTop:15,
-      marginBottom:20,
-      minWidth:300,
-      flexWrap:'wrap',
-      height : 40,
-      paddingHorizontal : 10,
-    },
-    submitbutton:{
-      color: '#ffffff',
-      textAlign:'center',
-      fontWeight:'700'
     }
   });

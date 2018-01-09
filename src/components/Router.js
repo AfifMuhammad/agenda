@@ -11,23 +11,17 @@ import {
 import Login from './login/Login'
 import Main from './main/Main'
 import Add from './add/Add'
-import Edit from './edit/Edit'
 import Detail from './edit/Detail'
 
 export default class Router extends Component {
   constructor(props) {
     super(props);
-    this.componentDidMount = this.componentDidMount.bind(this);
     this.state = {
       token : null
     };
   }
 
   
-
-  componentDidMount(){
-
-  }
 
    render() {
       return (
@@ -57,6 +51,7 @@ export default class Router extends Component {
                {...route.passProps} 
                token = {route.token}
                username = {route.username}
+               nama = {route.nama}
             />
          )
       }
@@ -68,22 +63,9 @@ export default class Router extends Component {
               {...route.passProps} 
               token = {route.token}
               username = {route.username}
-              route = {route.name}
            />
         )
      }
-     if(route.name == 'Edit') {
-      return (
-        component =
-         <Edit
-            navigator = {navigator}
-            {...route.passProps} 
-            token = {route.token}
-            username = {route.username}
-            idA = {route.idA}
-         />
-      )
-    }
     if(route.name == 'Detail') {
       return (
         component =

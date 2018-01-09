@@ -1,13 +1,10 @@
 import React, { Component } from 'react';
 import Button from './Button';
 import {
-  AppRegistry,
   StyleSheet,
   Text,
   View,
-  Alert,
   TextInput,
-  TouchableOpacity,
   KeyboardAvoidingView,
   Image,
   StatusBar
@@ -19,7 +16,7 @@ export default class Login extends Component {
     super(props);
     this._userLogin = this._userLogin.bind(this);
 
-    this.state = {user: '', pass: '', status : '', tkn : ''};
+    this.state = {user: '', pass: '', status : '', tkn : '', nama: ''};
     
 } 
 
@@ -29,7 +26,7 @@ export default class Login extends Component {
           <View style = {styles.logoConten}>
             <Image
              style = {styles.logo}
-             source={require('../images/logo.png')} />
+             source={require('../images/logoapp.png')} />
           <Text style = {styles.titleApp}>AGENDA UIN SUKA</Text>
           </View>
           {/* <LoginForm style ={{flex:0}}/> */}
@@ -59,16 +56,13 @@ export default class Login extends Component {
               onChangeText={(pass) => this.setState({pass})}
               style = {styles.input}>
             </TextInput>
+            <Button _userLogin = {this._userLogin}/>
           </KeyboardAvoidingView>
-          <Button _userLogin = {this._userLogin}/>
       </View>
     );
   }
-  openMenu = () =>{
-    Alert.alert("aaa")
-  }
 
-  _userLogin() {
+  token() {
       fetch(`http://rpl.camara.co.id/rest/generate`, {
         method: "POST",
         headers: {
@@ -78,38 +72,67 @@ export default class Login extends Component {
       })
       .then((response) => response.json())
       .then((responseData) => {
-        // alert(
-        //   JSON.stringify(responseData.status)
-        // )
         this.setState({status: responseData.status});
         if(this.state.status=="0"){
-          alert(JSON.stringify(responseData.message))
+          console.log("salah")
         }
         else{
-          // alert(
-          //   JSON.stringify(responseData)
-          // )
           this.setState({tkn: responseData.token});
-        //   this.props.navigator.push({
-        //     name: 'Main',
-        //     title: 'Main',
-        //     openMenu: this.openMenu,
-        //     token : this.state.tkn,
-        //     username : this.state.user
-        //  });
-        this.goToMain();
+        //this.goToMain();
         }
-      })
-      .done();
+      }).catch(error => {
+        console.log(error)
+      });
   }
 
+  generate() {
+    fetch(`http://rpl.camara.co.id/rest/generate`, {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: `username=afif&password=afa`
+    })
+    .then((response) => response.json())
+    .then((responseData) => {
+      this.setState({tkn: responseData.token});
+      console.log(this.state.tkn)
+      this.goToMain();
+    }).catch(error => {
+      console.log(error)
+    });
+}
+
+  _userLogin() {
+    fetch(`http://mobile.learning.uin-suka.ac.id/tmp900/login?auth=8f304662ebfee3932f2e810aa8fb628736&username=${this.state.user}&password=${this.state.pass}`, {
+      method: "GET",
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    })
+    .then((response) => response.json())
+    .then((responseData) => {
+      this.setState({status: responseData.data[0].success});
+      if(this.state.status=="false"){
+        alert("Username/Password salah")
+      }
+      else{
+        this.setState({nama: responseData.data[0].nama});
+        this.generate();
+      }
+    }).catch(error => {
+      alert(error);
+    });
+}
+
   goToMain = () => {
+    console.log(this.state.nama)
     this.props.navigator.push({
        name: 'Main',
        title: 'Main',
-       openMenu: this.openMenu,
        token : this.state.tkn,
-       username : this.state.user
+       username : this.state.user,
+       nama: this.state.nama
     });
   }
 }
@@ -149,12 +172,7 @@ const styles = StyleSheet.create({
   },
   logo:{
     marginTop : 150,
-    width:150,
+    width:200,
     height: 200
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
+  }
 });

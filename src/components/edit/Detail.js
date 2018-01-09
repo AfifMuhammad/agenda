@@ -3,13 +3,17 @@ import {
   Text,
   BackHandler,
   StyleSheet,
-  TextInput,
-  View
+  View,
+  Alert
 } from 'react-native';
+import Button from './Button';
+import Header from '../Header';
 
 export default class Edit extends Component{
   constructor(props){
     super(props)
+    this._confirm = this._confirm.bind(this);
+    this.backAndroidHandler = this.backAndroidHandler.bind(this);
     this.state = {
       jumlah:null, tgl_mulai:null, tgl_selesai:null, isi_agenda:null,
       jam_mulai : null, jam_selesai : null
@@ -41,68 +45,100 @@ export default class Edit extends Component{
         }
       }
 
-    })
-    .done();
+    }).catch(error => {
+      alert(error);
+    });
   }
 
   componentDidMount(){
-    BackHandler.addEventListener('hardwareBackPress', () => {
-      this.props.navigator.pop()
-      return true;
-    });
-    console.log(this.props.idA)
+    BackHandler.addEventListener('hardwareBackPress', this.backAndroidHandler);
   }
 
-  
+  componentWillUnmount(){
+    BackHandler.removeEventListener('hardwareBackPress', this.backAndroidHandler);
+  }
+
+ 
+
     render() {
       
       return (
         <View>
+          <Header username = {this.props.username}/>
           <View style={styles.container}>
-            <Text>ISI AGENDA</Text>
-            <View style={styles.item}>
+            <Text>ISI AGENDA :</Text>
+            <View style={styles.input}>
                 <Text>
                     {this.state.isi_agenda}
                 </Text>
             </View>
 
-            <Text>TANGGAL MULAI</Text>
-            <View style={styles.item}>
+            <Text>WAKTU MULAI :</Text>
+            <View style={styles.input}>
                 <Text>
-                    {this.state.tgl_mulai}
+                    {this.state.tgl_mulai}  ({this.state.jam_mulai})
                 </Text>
             </View>
 
-            <Text>TANGGAL SELESAI</Text>
-            <View style={styles.item}>
+            <Text>WAKTU SELESAI :</Text>
+            <View style={styles.input}>
                 <Text>
-                    {this.state.tgl_selesai}
+                    {this.state.tgl_selesai}  ({this.state.jam_selesai})
                 </Text>
             </View>
 
-            <TextInput
-              placeholder = "Tempat"
-              placeholderTextColor = '#cccccc'
-              returnKeyType="next"
-              autoCorrect = {false}
-              style = {styles.input}
-              //onChangeText={(tempat) => this.setState({tempat})}
-              >
-            </TextInput>
-
-            <Button _submitData = {this._confirm}/>
+            <Button _hapus = {this._confirm}/>
             
             </View>
         </View>
       ); 
+    }
+
+    _confirm(){
+      Alert.alert(
+        'Hapus',
+        'Hapus Agenda ?',
+        [
+          {text: 'Batal'},
+          {text: 'Ya', onPress: this.hapus.bind(this)},
+        ],
+      )
+    }
+
+    hapus = () =>{
+      fetch(`http://rpl.camara.co.id/api/agenda/${this.props.idA}`, {
+        method: "DELETE",
+        headers: {
+          'Authorization': this.props.token
+        },
+      })
+      .then((response) => response.json())
+      .then((responseData) => {
+        this.goToMain();
+  
+      })
+      .done();
+    }
+
+    backAndroidHandler(){
+      this.props.navigator.pop()
+      return true;
+    } 
+
+    goToMain = () => {
+      this.props.navigator.push({
+         name: 'Main',
+         title: 'Main',
+         token : this.props.token,
+         username : this.props.username
+      });
     }
 }
 
 const styles = StyleSheet.create({
   container: {
     padding :20,
-    marginBottom : 100,
-    marginTop : 100
+    marginBottom : 100
   },
   input:{
     minWidth:300,
@@ -110,28 +146,5 @@ const styles = StyleSheet.create({
     height : 40,
     paddingHorizontal : 10,
     marginBottom : 10,
-  },
-  buttonContainer:{
-    backgroundColor: "#006400",
-    paddingVertical:10,
-    marginTop:15,
-    marginBottom:20,
-    minWidth:300,
-    flexWrap:'wrap',
-    height : 40,
-    paddingHorizontal : 10,
-  },
-  item: {
-    backgroundColor: 'white',
-    flex: 1,
-    borderRadius: 5,
-    padding: 10,
-    marginRight: 10,
-    marginTop: 17
-  },
-  submitbutton:{
-    color: '#ffffff',
-    textAlign:'center',
-    fontWeight:'700'
   }
 });

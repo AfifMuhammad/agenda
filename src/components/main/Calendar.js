@@ -6,8 +6,6 @@ import {
   StyleSheet
 } from 'react-native';
 import {Agenda} from 'react-native-calendars';
-import Login from '../login/Login';
-import Edit from '../edit/Edit';
 
 
 
@@ -16,14 +14,51 @@ export default class Calendar extends Component {
     super(props);
     this.componentWillMount = this.componentWillMount.bind(this);
     this.state = {
-      items: {'2017-10-22': [{name: 'item 1 - any js object', time:'saiki'},{name: 'asdnsdbgjfsfdgjbsgjsdjfgj'}],},
-      data : null, jumlah : null
+      items: {'2017-10-22': [{name: 'example'}],},
+      jumlah : null
     };
   }
 
   componentWillMount(){
+    this.loadTenan();
+    //this.loadDummy();
     
-    fetch(`http://rpl.camara.co.id/api/agenda/${this.props.username}`, {
+  }
+
+  loadTenan(){
+    fetch(`http://mobile.learning.uin-suka.ac.id/tmp901/jadwal`, {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+    })
+    .then((response) => response.json())
+    .then((responseData) => {
+      console.log(responseData)
+      
+      this.setState({jumlah : Object.keys(responseData.data).length})
+
+      for (let j = 0; j < this.state.jumlah; j++) {
+        const time = responseData.data[j].tgl_mulai;
+        const strTime = this.timeToString(time);
+        
+        if(!this.state.items[time]){
+          this.state.items[time] = [];
+        }
+        this.state.items[time].push({
+          name: responseData.data[j].isi_agenda,
+          time : responseData.data[j].jam_mulai,
+          id : responseData.data[j].id_agenda
+         });
+      }
+
+    }).catch(error => {
+      alert(error);
+    });
+  }
+
+  loadDummy(){
+    fetch(`http://rpl.camara.co.id/api/agenda/username/${this.props.username}`, {
       method: "GET",
       headers: {
         'Authorization': this.props.token
@@ -31,35 +66,28 @@ export default class Calendar extends Component {
     })
     .then((response) => response.json())
     .then((responseData) => {
-
-      // alert(
-      //   JSON.stringify(responseData)
-      // )
-      //console.log(this.props.token)
       
       this.setState({jumlah : Object.keys(responseData.data).length})
-      console.log(this.state.jumlah)
-      this.setState({data : responseData})
 
       for (let j = 0; j < this.state.jumlah; j++) {
-        const time = this.state.data.data[j].tgl_mulai;
+        const time = responseData.data[j].tgl_mulai;
         const strTime = this.timeToString(time);
         if(!this.state.items[strTime]){
           this.state.items[strTime] = [];
         }
         this.state.items[strTime].push({
-          name: this.state.data.data[j].isi_agenda,
-          time : this.state.data.data[j].jam_mulai,
-          id : this.state.data.data[j].id_agenda
+          name: responseData.data[j].isi_agenda,
+          time : responseData.data[j].jam_mulai,
+          id : responseData.data[j].id_agenda
          });
       }
 
-    })
-    .done();
+    }).catch(error => {
+      alert(error);
+    });
   }
 
   render() {
-    //console.log(this.state.id)
     return (
       <Agenda
         items={this.state.items}
@@ -105,7 +133,10 @@ export default class Calendar extends Component {
   }
   
   getID=(id_ag)=>{ 
-    this.props._goToDetail(id_ag)
+    if(id_ag!=null){
+      this.props._goToDetail(id_ag)
+    }
+    
   }
 
   
@@ -128,22 +159,6 @@ export default class Calendar extends Component {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    backgroundColor: '#ffffff',
-    marginTop : 0,
-    marginBottom : 0
-  },
-  buttonContainer:{
-    backgroundColor: "#ffffff",
-    paddingVertical:10,
-    marginTop:15,
-    marginBottom:20,
-    minWidth:300,
-    flexWrap:'wrap',
-    height : 40,
-    paddingHorizontal : 10,
-  },
   item: {
     backgroundColor: 'white',
     flex: 1,

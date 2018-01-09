@@ -10,8 +10,8 @@ export default Button = (props) => {
     return (
        <View style = {styles.container}>
           <TouchableOpacity style = {styles.buttonContainer}
-          onPress = {props._submitData}>
-          <Text style ={styles.loginbutton}>SIMPAN</Text>
+          onPress = {props._hapus}>
+          <Text style ={styles.loginbutton}>Hapus</Text>
           </TouchableOpacity>
        </View>
     )
@@ -23,11 +23,11 @@ export default Button = (props) => {
       marginBottom : 100,
     },
     buttonContainer:{
-      backgroundColor: "#006400",
+      backgroundColor: "#FF0000",
       paddingVertical:10,
       marginTop:15,
       marginBottom:20,
-      minWidth:300,
+      minWidth:30,
       flexWrap:'wrap',
       height : 40,
       paddingHorizontal : 10,
